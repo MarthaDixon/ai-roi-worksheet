@@ -61,6 +61,10 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 /* Result panel */
+.howto { margin: 12px 0 0; padding: 12px 16px; border-radius: 8px; background: var(--accent-soft); max-width: 62ch; }
+.howto a { color: var(--accent); font-weight: 600; white-space: nowrap; }
+.result-label { display: flex; flex-direction: column; gap: 2px; }
+.auto { font-size: 13px; color: var(--muted); }
 .result { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
 .result-top { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; }
 .pill { font-family: var(--font-data); font-weight: 600; font-size: 15px; letter-spacing: 0.08em; padding: 8px 14px; border-radius: 999px; }
@@ -113,6 +117,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
     <div class="eyebrow">The Other Side of the Ledger</div>
     <h1>AI ROI Worksheet</h1>
     <p class="lede">Work out whether an AI feature in your contact center is paying for itself, using one headline number: cost per resolved contact.</p>
+    <p class="howto"><strong>How it works:</strong> enter your numbers in steps 1 to 4 below. Your verdict and results calculate automatically. <a href="#s1">Start at step 1</a></p>
   </header>
 
   <div class="toolbar">
@@ -124,10 +129,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
 
   <section class="result" aria-labelledby="result-title">
     <div class="result-top">
-      <h2 id="result-title">Quarterly verdict</h2>
+      <div class="result-label"><h2 id="result-title">Your quarterly verdict</h2><span class="auto">Calculated automatically from steps 1–4</span></div>
       <span class="pill stop" id="verdict">ENTER YOUR NUMBERS</span>
     </div>
-    <p class="reason" id="reason">Fill in the baseline and the with-AI numbers below.</p>
+    <p class="reason" id="reason">Fill in steps 1 and 2 below to see your result.</p>
     <div class="stats">
       <div class="stat"><span class="k">Cost per resolution, before AI</span><span class="v" id="out-cpr0">—</span></div>
       <div class="stat"><span class="k">Cost per resolution, with AI</span><span class="v" id="out-cpr1">—</span></div>
@@ -138,21 +143,21 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
     <p class="note">Estimates only, based on your inputs. Not financial advice. See the disclaimer below.</p>
   </section>
 
-  <section class="step" aria-labelledby="s1">
+  <section class="step" id="step-1" aria-labelledby="s1">
     <div class="step-head"><span class="num">01</span><h2 id="s1">Baseline, before AI</h2></div>
     <div class="fields">
       <div class="field">
         <label for="c0">Contacts handled per month</label>
-        <div class="input-row"><input id="c0" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><input id="c0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
       </div>
       <div class="field">
         <label for="cost0">Fully loaded cost per contact</label>
-        <div class="input-row"><span>$</span><input id="cost0" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="cost0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
         <span class="hint">SQM benchmark: $8.60 per call</span>
       </div>
       <div class="field">
         <label for="r0">Contacts needed per resolution</label>
-        <div class="input-row"><input id="r0" type="number" inputmode="decimal" min="1" step="any"></div>
+        <div class="input-row"><input id="r0" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
         <span class="hint">SQM benchmark: 1.4. Use customer-reported repeats if you have them.</span>
       </div>
     </div>
@@ -164,26 +169,26 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
     <div class="fields">
       <div class="field">
         <label for="c1">Contacts handled per month</label>
-        <div class="input-row"><input id="c1" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><input id="c1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
         <span class="hint">Human and AI combined</span>
       </div>
       <div class="field">
         <label for="ai">Share fully handled by AI</label>
-        <div class="input-row"><input id="ai" type="number" inputmode="decimal" min="0" max="100" step="any"><span>%</span></div>
+        <div class="input-row"><input id="ai" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"><span>%</span></div>
         <span class="hint">Resolved without a human, not just contained</span>
       </div>
       <div class="field">
         <label for="hc">Cost per human-handled contact</label>
-        <div class="input-row"><span>$</span><input id="hc" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="hc" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
       </div>
       <div class="field">
         <label for="ac">AI usage cost per AI-handled contact</label>
-        <div class="input-row"><span>$</span><input id="ac" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="ac" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
         <span class="hint">Tokens, per-minute or per-request charges</span>
       </div>
       <div class="field">
         <label for="r1">Contacts needed per resolution</label>
-        <div class="input-row"><input id="r1" type="number" inputmode="decimal" min="1" step="any"></div>
+        <div class="input-row"><input id="r1" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
         <span class="hint">Include repeats after failed handoffs</span>
       </div>
     </div>
@@ -194,20 +199,20 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
     <div class="fields">
       <div class="field">
         <label for="f-platform">Platform and licenses</label>
-        <div class="input-row"><span>$</span><input id="f-platform" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="f-platform" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
       </div>
       <div class="field">
         <label for="f-build">Build and maintenance</label>
-        <div class="input-row"><span>$</span><input id="f-build" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="f-build" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
         <span class="hint">One-time build spread over its expected life</span>
       </div>
       <div class="field">
         <label for="f-knowledge">Knowledge content upkeep</label>
-        <div class="input-row"><span>$</span><input id="f-knowledge" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="f-knowledge" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
       </div>
       <div class="field">
         <label for="f-people">People who manage the AI</label>
-        <div class="input-row"><span>$</span><input id="f-people" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div class="input-row"><span>$</span><input id="f-people" type="text" inputmode="decimal" autocomplete="off" spellcheck="false"></div>
       </div>
     </div>
     <div class="calc" id="calc-ai">With-AI cost per resolution = (human cost + AI usage + full monthly cost) ÷ resolutions.</div>
@@ -247,7 +252,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
   var isExample = false;
   var $ = function (id) { return document.getElementById(id); };
   var money = function (n) { return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n < 100 ? 2 : 0 }); };
-  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; };
+  var num = function (id) {
+    var raw = String($(id).value || "").replace(/[^0-9.]/g, "");
+    if (raw === "") return NaN;
+    var v = parseFloat(raw); return isFinite(v) ? v : NaN;
+  };
 
   function save() {
     try {
@@ -307,7 +316,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
 
     var changeEl = $("out-change"), monthlyEl = $("out-monthly");
     changeEl.className = "v"; monthlyEl.className = "v";
-    var verdict = "ENTER YOUR NUMBERS", cls = "stop", reason = "Fill in the baseline and the with-AI numbers below.";
+    var verdict = "ENTER YOUR NUMBERS", cls = "stop", reason = "Fill in steps 1 and 2 below to see your result.";
     var pct = NaN, monthly = NaN;
 
     if (ok0 && ok1) {
@@ -353,7 +362,10 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); ou
   }
 
   function onChange() { isExample = false; compute(); save(); }
-  ids.forEach(function (id) { $(id).addEventListener("input", onChange); });
+  ids.forEach(function (id) {
+    $(id).addEventListener("input", onChange);
+    $(id).addEventListener("focus", function () { try { this.select(); } catch (e) {} });
+  });
   checks.forEach(function (id) { $(id).addEventListener("change", function () { compute(); save(); }); });
 
   $("btn-example").addEventListener("click", function () { fill(example, true); compute(); save(); $("status").textContent = "Example loaded"; });
