@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI ROI Worksheet</title>
+<meta name="description" content="Compare cost per resolved contact before and after AI and get a keep, fix or switch-off verdict.">
+<meta property="og:title" content="AI ROI Worksheet">
+<meta property="og:description" content="Is your contact center AI paying for itself? Compare cost per resolved contact before and after AI.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a single working column — verdict first, then the four worksheet steps, then sources. Ledger-meter look shared with the LinkedIn series. */
+:root {
+  --bg: #F3F6F9;
+  --surface: #FFFFFF;
+  --ink: #0F1B2D;
+  --muted: #4A5B73;
+  --line: #D5DEE8;
+  --accent: #0B7A57;
+  --accent-soft: #E1F3EC;
+  --warn: #9A5B00;
+  --warn-soft: #FBEFD9;
+  --stop: #4A5B73;
+  --stop-soft: #E7ECF2;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1B2D; --surface: #17263D; --ink: #F2F4F7; --muted: #A9B8CB; --line: #2B3D57;
+    --accent: #5BD6A6; --accent-soft: #163A33; --warn: #F5B547; --warn-soft: #3A2E17;
+    --stop: #A9B8CB; --stop-soft: #22324A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1B2D; --surface: #17263D; --ink: #F2F4F7; --muted: #A9B8CB; --line: #2B3D57;
+  --accent: #5BD6A6; --accent-soft: #163A33; --warn: #F5B547; --warn-soft: #3A2E17;
+  --stop: #A9B8CB; --stop-soft: #22324A; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 56px;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.eyebrow { font-family: var(--font-data); font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+h1 { margin: 6px 0 8px; font-size: clamp(32px, 6vw, 44px); line-height: 1.1; text-wrap: balance; }
+h2 { margin: 0; font-size: 20px; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; }
+.note { font-size: 14px; color: var(--muted); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button {
+  font: 600 15px var(--font-body); min-height: 44px; padding: 0 18px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Result panel */
+.result { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.result-top { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; }
+.pill { font-family: var(--font-data); font-weight: 600; font-size: 15px; letter-spacing: 0.08em; padding: 8px 14px; border-radius: 999px; }
+.pill.keep { background: var(--accent-soft); color: var(--accent); }
+.pill.fix { background: var(--warn-soft); color: var(--warn); }
+.pill.stop { background: var(--stop-soft); color: var(--stop); }
+.reason { margin: 0; color: var(--muted); max-width: 62ch; }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.stat { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 2px solid var(--line); min-width: 0; }
+.stat .k { font-size: 13px; color: var(--muted); }
+.stat .v { font-family: var(--font-data); font-size: clamp(22px, 5vw, 30px); font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat .v.good { color: var(--accent); }
+.stat .v.bad { color: var(--warn); }
+
+/* Steps */
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+.step-head { display: flex; gap: 14px; align-items: baseline; }
+.num { font-family: var(--font-data); font-weight: 600; color: var(--accent); font-size: 15px; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 20px; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label { font-weight: 600; font-size: 15px; }
+.field .hint { font-size: 13px; color: var(--muted); }
+.input-row { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.input-row span { font-family: var(--font-data); color: var(--muted); padding: 0 10px; font-size: 15px; }
+.input-row input {
+  flex: 1; min-width: 0; min-height: 44px; border: 0; background: transparent; color: var(--ink);
+  font: 500 17px var(--font-data); font-variant-numeric: tabular-nums; padding: 0 12px;
+}
+.input-row:focus-within { border-color: var(--accent); }
+.calc { font-size: 14px; color: var(--muted); padding-top: 12px; border-top: 1px dashed var(--line); }
+.calc strong { font-family: var(--font-data); color: var(--ink); }
+.checks { display: flex; flex-direction: column; gap: 10px; }
+.check { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; padding: 8px 0; cursor: pointer; }
+.check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+.disclaimer { border-top: 1px solid var(--line); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: var(--muted); }
+.disclaimer h2 { font-size: 15px; color: var(--ink); }
+.disclaimer p { margin: 0; max-width: 70ch; }
+.sources { font-size: 14px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
+.sources a { color: var(--accent); }
+@media (max-width: 560px) {
+  .fields, .stats { grid-template-columns: minmax(0, 1fr); }
+  .result, .step { padding: 18px; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">The Other Side of the Ledger</div>
+    <h1>AI ROI Worksheet</h1>
+    <p class="lede">Work out whether an AI feature in your contact center is paying for itself, using one headline number: cost per resolved contact.</p>
+  </header>
+
+  <div class="toolbar">
+    <button type="button" id="btn-example">Load example</button>
+    <button type="button" id="btn-clear">Clear all</button>
+    <button type="button" class="primary" id="btn-copy">Copy summary</button>
+    <span class="note" id="status" role="status"></span>
+  </div>
+
+  <section class="result" aria-labelledby="result-title">
+    <div class="result-top">
+      <h2 id="result-title">Quarterly verdict</h2>
+      <span class="pill stop" id="verdict">ENTER YOUR NUMBERS</span>
+    </div>
+    <p class="reason" id="reason">Fill in the baseline and the with-AI numbers below.</p>
+    <div class="stats">
+      <div class="stat"><span class="k">Cost per resolution, before AI</span><span class="v" id="out-cpr0">—</span></div>
+      <div class="stat"><span class="k">Cost per resolution, with AI</span><span class="v" id="out-cpr1">—</span></div>
+      <div class="stat"><span class="k">Change in cost per resolution</span><span class="v" id="out-change">—</span></div>
+      <div class="stat"><span class="k">Monthly impact at current volume</span><span class="v" id="out-monthly">—</span></div>
+    </div>
+    <p class="note" id="example-flag" hidden>Showing example figures. Replace them with your own.</p>
+    <p class="note">Estimates only, based on your inputs. Not financial advice. See the disclaimer below.</p>
+  </section>
+
+  <section class="step" aria-labelledby="s1">
+    <div class="step-head"><span class="num">01</span><h2 id="s1">Baseline, before AI</h2></div>
+    <div class="fields">
+      <div class="field">
+        <label for="c0">Contacts handled per month</label>
+        <div class="input-row"><input id="c0" type="number" inputmode="decimal" min="0" step="any"></div>
+      </div>
+      <div class="field">
+        <label for="cost0">Fully loaded cost per contact</label>
+        <div class="input-row"><span>$</span><input id="cost0" type="number" inputmode="decimal" min="0" step="any"></div>
+        <span class="hint">SQM benchmark: $8.60 per call</span>
+      </div>
+      <div class="field">
+        <label for="r0">Contacts needed per resolution</label>
+        <div class="input-row"><input id="r0" type="number" inputmode="decimal" min="1" step="any"></div>
+        <span class="hint">SQM benchmark: 1.4. Use customer-reported repeats if you have them.</span>
+      </div>
+    </div>
+    <div class="calc" id="calc-baseline">Baseline cost per resolution = cost per contact × contacts per resolution.</div>
+  </section>
+
+  <section class="step" aria-labelledby="s2">
+    <div class="step-head"><span class="num">02</span><h2 id="s2">With AI, same period length</h2></div>
+    <div class="fields">
+      <div class="field">
+        <label for="c1">Contacts handled per month</label>
+        <div class="input-row"><input id="c1" type="number" inputmode="decimal" min="0" step="any"></div>
+        <span class="hint">Human and AI combined</span>
+      </div>
+      <div class="field">
+        <label for="ai">Share fully handled by AI</label>
+        <div class="input-row"><input id="ai" type="number" inputmode="decimal" min="0" max="100" step="any"><span>%</span></div>
+        <span class="hint">Resolved without a human, not just contained</span>
+      </div>
+      <div class="field">
+        <label for="hc">Cost per human-handled contact</label>
+        <div class="input-row"><span>$</span><input id="hc" type="number" inputmode="decimal" min="0" step="any"></div>
+      </div>
+      <div class="field">
+        <label for="ac">AI usage cost per AI-handled contact</label>
+        <div class="input-row"><span>$</span><input id="ac" type="number" inputmode="decimal" min="0" step="any"></div>
+        <span class="hint">Tokens, per-minute or per-request charges</span>
+      </div>
+      <div class="field">
+        <label for="r1">Contacts needed per resolution</label>
+        <div class="input-row"><input id="r1" type="number" inputmode="decimal" min="1" step="any"></div>
+        <span class="hint">Include repeats after failed handoffs</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" aria-labelledby="s3">
+    <div class="step-head"><span class="num">03</span><h2 id="s3">Full monthly cost of running the AI</h2></div>
+    <div class="fields">
+      <div class="field">
+        <label for="f-platform">Platform and licenses</label>
+        <div class="input-row"><span>$</span><input id="f-platform" type="number" inputmode="decimal" min="0" step="any"></div>
+      </div>
+      <div class="field">
+        <label for="f-build">Build and maintenance</label>
+        <div class="input-row"><span>$</span><input id="f-build" type="number" inputmode="decimal" min="0" step="any"></div>
+        <span class="hint">One-time build spread over its expected life</span>
+      </div>
+      <div class="field">
+        <label for="f-knowledge">Knowledge content upkeep</label>
+        <div class="input-row"><span>$</span><input id="f-knowledge" type="number" inputmode="decimal" min="0" step="any"></div>
+      </div>
+      <div class="field">
+        <label for="f-people">People who manage the AI</label>
+        <div class="input-row"><span>$</span><input id="f-people" type="number" inputmode="decimal" min="0" step="any"></div>
+      </div>
+    </div>
+    <div class="calc" id="calc-ai">With-AI cost per resolution = (human cost + AI usage + full monthly cost) ÷ resolutions.</div>
+  </section>
+
+  <section class="step" aria-labelledby="s4">
+    <div class="step-head"><span class="num">04</span><h2 id="s4">Evidence check</h2></div>
+    <div class="checks">
+      <label class="check" for="k-baseline"><input type="checkbox" id="k-baseline"><span>Baseline captured before launch</span></label>
+      <label class="check" for="k-control"><input type="checkbox" id="k-control"><span>Compared against a control group or staggered rollout</span></label>
+      <label class="check" for="k-customer"><input type="checkbox" id="k-customer"><span>Resolution confirmed by customers, not only by internal data</span></label>
+      <label class="check" for="k-owner"><input type="checkbox" id="k-owner"><span>A named business owner for this AI feature</span></label>
+    </div>
+    <p class="note" id="evidence-note"></p>
+  </section>
+
+  <section class="disclaimer" aria-labelledby="disc-title">
+    <h2 id="disc-title">Disclaimer</h2>
+    <p>This worksheet is a simplified planning tool for estimating cost per resolved contact. It is for general information only and is not financial, accounting, legal or procurement advice.</p>
+    <p>Results depend entirely on the numbers you enter and on simplifying assumptions, such as treating every contact at a single average cost. They are estimates, not guarantees of savings or outcomes. Benchmark figures are published industry averages and may not reflect your operation. Example figures are illustrative only.</p>
+    <p>Vendor pricing, contract terms and AI usage charges vary and change over time. Confirm costs with your providers and validate any decision with your finance team. This tool is independent and not affiliated with or endorsed by any vendor named in the related posts.</p>
+  </section>
+
+  <footer class="sources">
+    <span>Benchmarks: <a href="https://www.sqmgroup.com/resources/library/blog/call-center-operational-data-findings" target="_blank" rel="noopener">SQM Group call center operational data</a>. Your inputs stay in your browser.</span>
+    <span>From the LinkedIn series “The Token Tab” and “The Other Side of the Ledger.”</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var ids = ["c0","cost0","r0","c1","ai","hc","ac","r1","f-platform","f-build","f-knowledge","f-people"];
+  var checks = ["k-baseline","k-control","k-customer","k-owner"];
+  var example = { "c0": 50000, "cost0": 8.60, "r0": 1.4, "c1": 50000, "ai": 25, "hc": 8.60, "ac": 0.60, "r1": 1.35,
+    "f-platform": 4000, "f-build": 2000, "f-knowledge": 1500, "f-people": 6000 };
+  var KEY = "ai-roi-worksheet-v1";
+  var isExample = false;
+  var $ = function (id) { return document.getElementById(id); };
+  var money = function (n) { return n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: n < 100 ? 2 : 0 }); };
+  var num = function (id) { var v = parseFloat($(id).value); return isFinite(v) ? v : NaN; };
+
+  function save() {
+    try {
+      var data = { isExample: isExample, v: {}, k: {} };
+      ids.forEach(function (id) { data.v[id] = $(id).value; });
+      checks.forEach(function (id) { data.k[id] = $(id).checked; });
+      localStorage.setItem(KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+  function fill(values, flag) {
+    ids.forEach(function (id) { $(id).value = values[id] != null ? values[id] : ""; });
+    isExample = flag;
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) {
+        var d = JSON.parse(raw);
+        fill(d.v || {}, !!d.isExample);
+        checks.forEach(function (id) { $(id).checked = !!(d.k && d.k[id]); });
+        return;
+      }
+    } catch (e) {}
+    fill(example, true);
+  }
+
+  var last = null;
+  function compute() {
+    var c0 = num("c0"), cost0 = num("cost0"), r0 = num("r0");
+    var c1 = num("c1"), ai = num("ai"), hc = num("hc"), ac = num("ac"), r1 = num("r1");
+    var fixed = ["f-platform","f-build","f-knowledge","f-people"].reduce(function (s, id) { var v = num(id); return s + (isFinite(v) ? v : 0); }, 0);
+    var ok0 = cost0 >= 0 && r0 >= 1;
+    var ok1 = c1 > 0 && ai >= 0 && ai <= 100 && hc >= 0 && ac >= 0 && r1 >= 1;
+
+    var cpr0 = ok0 ? cost0 * r0 : NaN;
+    $("out-cpr0").textContent = ok0 ? money(cpr0) : "—";
+    $("calc-baseline").innerHTML = ok0
+      ? "Baseline cost per resolution = <strong>" + money(cost0) + "</strong> × <strong>" + r0 + "</strong> = <strong>" + money(cpr0) + "</strong>" +
+        (c0 > 0 ? " across <strong>" + Math.round(c0 / r0).toLocaleString("en-US") + "</strong> resolutions a month." : ".")
+      : "Baseline cost per resolution = cost per contact × contacts per resolution.";
+
+    var cpr1 = NaN, res1 = NaN, total = NaN;
+    if (ok1) {
+      var aiShare = ai / 100;
+      var humanCost = c1 * (1 - aiShare) * hc;
+      var aiCost = c1 * aiShare * ac;
+      total = humanCost + aiCost + fixed;
+      res1 = c1 / r1;
+      cpr1 = total / res1;
+      $("calc-ai").innerHTML = "Human <strong>" + money(humanCost) + "</strong> + AI usage <strong>" + money(aiCost) +
+        "</strong> + full monthly cost <strong>" + money(fixed) + "</strong> = <strong>" + money(total) + "</strong> ÷ <strong>" +
+        Math.round(res1).toLocaleString("en-US") + "</strong> resolutions = <strong>" + money(cpr1) + "</strong> per resolution.";
+    } else {
+      $("calc-ai").textContent = "With-AI cost per resolution = (human cost + AI usage + full monthly cost) ÷ resolutions.";
+    }
+    $("out-cpr1").textContent = ok1 ? money(cpr1) : "—";
+
+    var changeEl = $("out-change"), monthlyEl = $("out-monthly");
+    changeEl.className = "v"; monthlyEl.className = "v";
+    var verdict = "ENTER YOUR NUMBERS", cls = "stop", reason = "Fill in the baseline and the with-AI numbers below.";
+    var pct = NaN, monthly = NaN;
+
+    if (ok0 && ok1) {
+      pct = (cpr1 - cpr0) / cpr0 * 100;
+      monthly = (cpr0 - cpr1) * res1;
+      changeEl.textContent = (pct > 0 ? "+" : "") + pct.toFixed(1) + "%";
+      changeEl.className = "v " + (pct < 0 ? "good" : "bad");
+      monthlyEl.textContent = (monthly >= 0 ? "Saves " : "Costs ") + money(Math.abs(monthly));
+      monthlyEl.className = "v " + (monthly >= 0 ? "good" : "bad");
+
+      var cheaper = cpr1 < cpr0;
+      var resolvesBetter = r1 <= r0;
+      var owner = $("k-owner").checked;
+      if (cheaper && resolvesBetter && owner) {
+        verdict = "KEEP"; cls = "keep";
+        reason = "Cost per resolution is down and customers need no more contacts to get an answer than before.";
+      } else if (cheaper && resolvesBetter) {
+        verdict = "FIX"; cls = "fix";
+        reason = "The numbers work, but nobody owns this feature. Name an owner before calling it a keep.";
+      } else if (cheaper || resolvesBetter) {
+        verdict = "FIX"; cls = "fix";
+        reason = cheaper
+          ? "It's cheaper per resolution, but customers need more contacts to get an answer. Check handoffs and repeat contacts."
+          : "Customers resolve with fewer contacts, but the full cost per resolution went up. Look at usage cost and overhead.";
+      } else {
+        verdict = "SWITCH OFF"; cls = "stop";
+        reason = "Cost per resolution is up and resolution hasn't improved. Unless the next review cycle changes that, retire it.";
+      }
+    } else {
+      changeEl.textContent = "—"; monthlyEl.textContent = "—";
+    }
+    $("verdict").textContent = verdict;
+    $("verdict").className = "pill " + cls;
+    $("reason").textContent = reason;
+    $("example-flag").hidden = !isExample;
+
+    var have = checks.filter(function (id) { return $(id).checked; }).length;
+    $("evidence-note").textContent = have === 4
+      ? "Strong evidence. This result should stand up to a finance review."
+      : have + " of 4 evidence checks met. Treat the result as directional until the rest are in place.";
+
+    last = { cpr0: cpr0, cpr1: cpr1, pct: pct, monthly: monthly, verdict: verdict, reason: reason, evidence: have };
+  }
+
+  function onChange() { isExample = false; compute(); save(); }
+  ids.forEach(function (id) { $(id).addEventListener("input", onChange); });
+  checks.forEach(function (id) { $(id).addEventListener("change", function () { compute(); save(); }); });
+
+  $("btn-example").addEventListener("click", function () { fill(example, true); compute(); save(); $("status").textContent = "Example loaded"; });
+  $("btn-clear").addEventListener("click", function () {
+    fill({}, false); checks.forEach(function (id) { $(id).checked = false; }); compute(); save(); $("status").textContent = "Cleared";
+  });
+  $("btn-copy").addEventListener("click", function () {
+    if (!last || !isFinite(last.cpr1)) { $("status").textContent = "Fill in both sections first"; return; }
+    var text = "AI ROI check\n" +
+      "Cost per resolution before AI: " + money(last.cpr0) + "\n" +
+      "Cost per resolution with AI: " + money(last.cpr1) + " (" + (last.pct > 0 ? "+" : "") + last.pct.toFixed(1) + "%)\n" +
+      "Monthly impact: " + (last.monthly >= 0 ? "saves " : "costs ") + money(Math.abs(last.monthly)) + "\n" +
+      "Verdict: " + last.verdict + ". " + last.reason + "\n" +
+      "Evidence checks met: " + last.evidence + " of 4\n" +
+      "Estimate only, based on the inputs entered. Not financial advice.";
+    var done = function () { $("status").textContent = "Summary copied"; };
+    try {
+      navigator.clipboard.writeText(text).then(done, function () { $("status").textContent = "Copy isn't available here. Select the results above instead."; });
+    } catch (e) { $("status").textContent = "Copy isn't available here. Select the results above instead."; }
+  });
+
+  load();
+  compute();
+})();
+</script>
+
+</body>
+</html>
